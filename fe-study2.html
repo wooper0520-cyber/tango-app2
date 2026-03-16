@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基本情報技術者 対策</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Sans','Yu Gothic UI',sans-serif;background:#F0F4F8;min-height:100vh;padding:16px}
+#app{max-width:560px;margin:0 auto}
+.screen{display:none}.screen.active{display:block}
+h1{font-size:20px;font-weight:800;color:#0F172A;margin-bottom:2px}
+h2{font-size:17px;font-weight:700;color:#0F172A;margin-bottom:10px}
+.sub{font-size:11px;color:#94A3B8;margin-bottom:20px;display:block}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.stat{background:#fff;border-radius:10px;padding:12px 8px;text-align:center;border:1px solid #E2E8F0}
+.stat.hi{background:#EFF6FF;border-color:#BFDBFE}
+.stat-n{font-size:24px;font-weight:800;color:#1E293B}
+.stat.hi .stat-n{color:#2563EB}
+.stat-l{font-size:10px;color:#94A3B8;margin-top:2px}
+.btn-col{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+button{font-family:inherit;cursor:pointer;border:none;font-size:14px;font-weight:600;border-radius:10px;padding:12px;width:100%;transition:opacity .1s}
+.bp{background:linear-gradient(135deg,#1D4ED8,#6D28D9);color:#fff;box-shadow:0 3px 10px rgba(29,78,216,.2)}
+.bp:disabled{background:#E2E8F0;color:#94A3B8;box-shadow:none;cursor:default}
+.bs{background:#fff;border:1.5px solid #E2E8F0 !important;color:#334155}
+.bb{background:none;border:none !important;color:#64748B;font-size:13px;width:auto;padding:0;margin-bottom:16px}
+.bp:not(:disabled):active,.bs:active{opacity:.8}
+label{font-size:11px;color:#64748B;font-weight:600;display:block;margin-bottom:4px}
+textarea,input,select{width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid #E2E8F0;font-size:13px;font-family:inherit;color:#1E293B;background:#fff;outline:none;box-sizing:border-box}
+textarea{resize:vertical;line-height:1.6}
+textarea:focus,input:focus,select:focus{border-color:#93C5FD}
+.msg{font-size:12px;padding:10px 0;display:none;text-align:center}
+.card-item{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #F1F5F9;border-radius:9px;padding:8px 11px;margin-bottom:5px}
+.tbadge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.cq{flex:1;font-size:12px;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd{font-size:9px;color:#CBD5E1;white-space:nowrap}.cd.due{color:#2563EB;font-weight:700}
+.pbar{height:5px;background:#E2E8F0;border-radius:3px;overflow:hidden;flex:1}
+.pfill{height:100%;background:linear-gradient(90deg,#1D4ED8,#6D28D9);border-radius:3px;transition:width .4s}
+.qcard{background:#fff;border:1.5px solid #E2E8F0;border-radius:14px;padding:18px 16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.qtxt{font-size:15px;font-weight:600;line-height:1.8;color:#111827}
+.abox{background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.albl{font-size:9px;color:#166534;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.atxt{font-size:13px;color:#14532D;line-height:1.7}
+.fbox{background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.flbl{font-size:9px;color:#1E40AF;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.ftxt{font-size:12px;color:#1E3A8A;line-height:1.7}
+.grade-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.gb{padding:11px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid transparent !important}
+.hint{font-size:11px;color:#64748B;margin-bottom:7px;display:block}
+.warn{background:#FFFBEB;border:1px solid #FDE68A;border-radius:9px;padding:11px 13px;font-size:12px;color:#92400E;line-height:1.7;margin-bottom:12px}
+.info-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px;font-size:12px;color:#334155;line-height:1.8;margin-bottom:14px}
+.sec-l{font-size:9px;color:#94A3B8;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;margin-top:4px}
+.tabs{display:flex;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;margin-bottom:16px}
+.tab{flex:1;padding:10px;border:none !important;font-size:13px;font-weight:600;cursor:pointer;border-radius:0;font-family:inherit}
+.tab.on{background:#1E293B;color:#fff}
+.tab.off{background:#fff;color:#64748B}
+.built-item{background:#fff;border:1px solid #E2E8F0;border-radius:11px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.built-item-info{flex:1}
+.built-item-name{font-size:13px;font-weight:700;color:#1E293B;margin-bottom:4px}
+.prog-mini{height:4px;background:#E2E8F0;border-radius:2px;overflow:hidden}
+.prog-mini-fill{height:100%;background:linear-gradient(90deg,#1D4ED8,#6D28D9);border-radius:2px}
+.add-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;white-space:nowrap;width:auto;border:none !important}
+.add-btn.done{background:#F1F5F9;color:#94A3B8;cursor:default}
+.add-btn.todo{background:linear-gradient(135deg,#1D4ED8,#6D28D9);color:#fff}
+.done-wrap{text-align:center;padding:50px 0}
+.preview-card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.cat-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cat-pill{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid #E2E8F0 !important;background:#fff;color:#64748B;width:auto}
+.cat-pill.on{background:#1E293B;color:#fff;border-color:#1E293B !important}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ホーム -->
+<div id="s-home" class="screen active">
+  <div style="margin-bottom:20px">
+    <div style="font-size:10px;letter-spacing:3px;color:#94A3B8;margin-bottom:4px">FE EXAM · STUDY APP</div>
+    <h1>基本情報技術者 対策</h1>
+    <span class="sub">分散学習 · リコール · 精緻化 · 自己説明</span>
+  </div>
+  <div class="stat-row">
+    <div class="stat" id="st-total"><div class="stat-n" id="sn-total">0</div><div class="stat-l">総問題</div></div>
+    <div class="stat" id="st-due"><div class="stat-n" id="sn-due">0</div><div class="stat-l">今日の復習</div></div>
+    <div class="stat" id="st-master"><div class="stat-n" id="sn-master">0</div><div class="stat-l">定着済み</div></div>
+  </div>
+  <div class="cat-row" id="cat-row"></div>
+  <div class="btn-col">
+    <button class="bp" id="btn-start" onclick="startSession()">復習を始める</button>
+    <button class="bs" onclick="goTo('s-built')">📚 内蔵問題から追加する</button>
+    <button class="bs" onclick="goTo('s-add')">✏️ 問題を自分で追加する</button>
+    <button class="bs" onclick="goTo('s-settings')">⚙️ API設定（AI生成に必要）</button>
+  </div>
+  <div id="recent-wrap" style="display:none">
+    <div class="sec-l">最近追加した問題</div>
+    <div id="recent-list"></div>
+  </div>
+</div>
+
+<!-- 内蔵問題 -->
+<div id="s-built" class="screen">
+  <button class="bb" onclick="goTo('s-home')">← 戻る</button>
+  <h2>内蔵問題を追加</h2>
+  <div id="built-list"></div>
+</div>
+
+<!-- 問題追加 -->
+<div id="s-add" class="screen">
+  <button class="bb" onclick="goTo('s-home')">← 戻る</button>
+  <h2>問題を追加する</h2>
+  <div class="tabs">
+    <button class="tab on" id="tab-m" onclick="switchTab('m')">手動で追加</button>
+    <button class="tab off" id="tab-a" onclick="switchTab('a')">AIで自動生成</button>
+  </div>
+
+  <!-- 手動 -->
+  <div id="panel-m">
+    <div style="margin-bottom:10px"><label>カテゴリ</label>
+      <select id="m-cat"><option>ストラテジ</option><option>マネジメント</option><option>テクノロジ</option><option>セキュリティ</option><option>ネットワーク</option><option>DB</option><option>ハードウェア</option><option>アルゴリズム</option><option>その他</option></select></div>
+    <div style="margin-bottom:10px"><label>問題文</label><textarea id="m-q" rows="3" placeholder="例：OSIの第3層は何か？"></textarea></div>
+    <div style="margin-bottom:10px"><label>解答・解説</label><textarea id="m-a" rows="3" placeholder="例：ネットワーク層。IPアドレスによる経路制御を担う。"></textarea></div>
+    <div style="margin-bottom:14px">
+      <label>問題タイプ</label>
+      <div style="display:flex;gap:12px;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="radio" name="m-type" value="recall" checked> リコール</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="radio" name="m-type" value="elaboration"> 精緻化</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="radio" name="m-type" value="selfexplain"> 自己説明</label>
+      </div>
+    </div>
+    <button class="bp" onclick="addManual()">この問題を追加する</button>
+    <div class="msg" id="m-msg"></div>
+  </div>
+
+  <!-- AI -->
+  <div id="panel-a" style="display:none">
+    <div id="api-warn" class="warn" style="display:none">⚠️ APIキーが未設定です。<span style="color:#1D4ED8;cursor:pointer;text-decoration:underline" onclick="goTo('s-settings')">⚙️ API設定</span>からAPIキーを設定してください。</div>
+    <div style="margin-bottom:10px"><label>カテゴリ</label>
+      <select id="a-cat"><option>ストラテジ</option><option>マネジメント</option><option>テクノロジ</option><option>セキュリティ</option><option>ネットワーク</option><option>DB</option><option>ハードウェア</option><option>アルゴリズム</option><option>その他</option></select></div>
+    <div style="margin-bottom:10px"><label>覚えたいテキスト</label><textarea id="a-text" rows="7" placeholder="教科書・ノートの内容を貼り付けてください"></textarea></div>
+    <div style="margin-bottom:14px"><label>生成問題数</label>
+      <select id="a-count"><option value="3">3問</option><option value="5" selected>5問</option><option value="8">8問</option><option value="10">10問</option></select></div>
+    <button class="bp" id="btn-ai-gen" onclick="generateAI()">AIで問題を生成する</button>
+    <div class="msg" id="a-msg"></div>
+    <div id="a-preview" style="display:none;margin-top:14px">
+      <div style="font-size:11px;color:#64748B;font-weight:600;margin-bottom:8px">生成された問題（確認してから追加）</div>
+      <div id="a-preview-list"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="bp" onclick="confirmAI()" style="flex:1">すべて追加する</button>
+        <button class="bs" onclick="cancelAI()" style="width:auto;padding:11px 16px">キャンセル</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API設定 -->
+<div id="s-settings" class="screen">
+  <button class="bb" onclick="goTo('s-home')">← 戻る</button>
+  <h2>API設定</h2>
+  <div class="warn">⚠️ APIキーはこのブラウザのlocalStorageに保存されます。個人利用のみにしてください。</div>
+  <div class="info-box">
+    <div style="font-weight:700;margin-bottom:6px">🔑 APIキーの取得方法</div>
+    <ol style="padding-left:16px">
+      <li>ブラウザで <b>console.anthropic.com</b> を開く</li>
+      <li>アカウント作成 or ログイン</li>
+      <li>左メニュー「API Keys」→「Create Key」</li>
+      <li><b>sk-ant-</b> で始まるキーをコピー</li>
+      <li>下に貼り付けて「保存する」をタップ</li>
+    </ol>
+  </div>
+  <div style="margin-bottom:10px"><label>Anthropic APIキー</label>
+    <textarea id="key-input" rows="3" placeholder="sk-ant-api03-..." style="font-family:monospace;font-size:12px;word-break:break-all"></textarea></div>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <button class="bs" onclick="clearKey()" style="width:auto;padding:11px 14px;font-size:12px">削除</button>
+    <button class="bp" onclick="saveKey()" style="flex:1">保存する</button>
+  </div>
+  <div class="msg" id="key-msg"></div>
+  <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0">
+    <div style="font-size:11px;color:#94A3B8;margin-bottom:6px">現在の状態</div>
+    <div id="key-status"></div>
+  </div>
+</div>
+
+<!-- セッション -->
+<div id="s-session" class="screen">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+    <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+    <div style="font-size:11px;color:#94A3B8;min-width:30px;text-align:right" id="ptxt">1/1</div>
+  </div>
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:7px">
+    <span class="tbadge" id="type-tag"></span>
+    <span class="tbadge" style="background:#F1F5F9;color:#64748B" id="cat-tag"></span>
+    <span style="font-size:10px;color:#94A3B8" id="reps-tag"></span>
+  </div>
+  <div class="qcard"><p class="qtxt" id="qtxt"></p></div>
+
+  <div id="ph-think">
+    <span class="hint">📝 ノートを見ずに思い出して書いてください</span>
+    <textarea id="u-ans" rows="3" placeholder="答えを書いてみましょう..."></textarea>
+    <div style="margin-top:8px"><button class="bp" id="btn-rev" onclick="revealAnswer()" disabled>答えを確認する →</button></div>
+  </div>
+
+  <div id="ph-load" style="display:none;text-align:center;padding:24px 0;color:#64748B;font-size:13px">確認中...</div>
+
+  <div id="ph-exp" style="display:none">
+    <div class="abox"><div class="albl">正解・解説</div><div class="atxt" id="a-txt"></div></div>
+    <div class="fbox" id="f-box" style="display:none"><div class="flbl">AIフィードバック</div><div class="ftxt" id="f-txt"></div></div>
+    <span class="hint">💬 自分の言葉で説明してみましょう</span>
+    <textarea id="u-exp" rows="2" placeholder="理解したことを自分の言葉で..." style="margin-bottom:12px"></textarea>
+    <span class="hint" style="margin-bottom:7px">どのくらい覚えていましたか？</span>
+    <div class="grade-grid">
+      <button class="gb" style="background:#FEE2E2;color:#DC2626;border-color:#DC262630 !important" onclick="gradeCard(0)">全忘れ</button>
+      <button class="gb" style="background:#FEF3C7;color:#D97706;border-color:#D9770630 !important" onclick="gradeCard(1)">難しかった</button>
+      <button class="gb" style="background:#DBEAFE;color:#2563EB;border-color:#2563EB30 !important" onclick="gradeCard(2)">思い出せた</button>
+      <button class="gb" style="background:#D1FAE5;color:#059669;border-color:#05966930 !important" onclick="gradeCard(3)">完璧！</button>
+    </div>
+  </div>
+</div>
+
+<!-- 完了 -->
+<div id="s-done" class="screen">
+  <div class="done-wrap">
+    <div style="font-size:48px;margin-bottom:14px">🎉</div>
+    <h1 style="margin-bottom:8px">セッション完了！</h1>
+    <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:24px">お疲れさまでした。次の復習日は自動スケジュール済みです。</p>
+    <div class="stat-row" style="margin-bottom:24px">
+      <div class="stat"><div class="stat-n" id="d-count">0</div><div class="stat-l">復習完了</div></div>
+      <div class="stat"><div class="stat-n" id="d-master">0</div><div class="stat-l">定着済み</div></div>
+      <div class="stat"><div class="stat-n" id="d-next">-</div><div class="stat-l">次の復習</div></div>
+    </div>
+    <button class="bp" onclick="goTo('s-home');renderHome()">ホームへ戻る</button>
+  </div>
+</div>
+
+</div>
+<script>
+// ══════════════════════════════════════
+// データ
+// ══════════════════════════════════════
+var cards = [];
+try { cards = JSON.parse(localStorage.getItem('fe_c') || '[]'); } catch(e) { cards = []; }
+
+var BUILT = {
+  'ストラテジ': [
+    {q:'CRMとは何か？',a:'Customer Relationship Management。顧客関係管理。顧客情報を一元管理し、関係を強化して売上・満足度を向上させる戦略・システム。',t:'recall'},
+    {q:'SCMとは何か？',a:'Supply Chain Management。調達から販売までのモノ・情報・資金の流れを最適化する管理手法。',t:'recall'},
+    {q:'ERPとは何か？',a:'Enterprise Resource Planning。企業の基幹業務（会計・人事・生産・販売など）を統合的に管理するシステム。',t:'recall'},
+    {q:'BPRとは何か？',a:'Business Process Reengineering。業務プロセスを抜本的に見直し、コスト・品質・スピードを劇的に改善する手法。',t:'recall'},
+    {q:'KGIとKPIの違いは？',a:'KGIは最終目標の達成度を示す指標。KPIはKGI達成に向けた中間的な業績指標。',t:'elaboration'},
+    {q:'バランススコアカード（BSC）の4つの視点を答えよ',a:'①財務 ②顧客 ③内部ビジネスプロセス ④学習と成長',t:'recall'},
+    {q:'SWOT分析とは？',a:'強み(S)・弱み(W)・機会(O)・脅威(T)を分析するフレームワーク。',t:'recall'},
+    {q:'PPMの4象限を答えよ',a:'①花形（高成長・高シェア）②金のなる木（低成長・高シェア）③問題児（高成長・低シェア）④負け犬（低成長・低シェア）',t:'recall'},
+    {q:'コアコンピタンスとは？',a:'他社に真似できない自社固有の中核的能力・強み。競争優位の源泉。',t:'recall'},
+    {q:'OEMとは？',a:'Original Equipment Manufacturer。他社ブランドの製品を製造すること。',t:'recall'},
+    {q:'ITガバナンスとは？',a:'経営戦略とITを整合させ、IT投資・リスク・パフォーマンスを組織全体で管理・統制する仕組み。',t:'recall'},
+    {q:'B2BとB2Cの違いは？',a:'B2Bは企業間取引、B2Cは企業・消費者間取引。',t:'recall'},
+    {q:'フィンテック（FinTech）とは？',a:'FinanceとTechnologyの造語。IT技術を活用した革新的な金融サービス。',t:'recall'},
+    {q:'ロングテール戦略とは？',a:'少量多品種の商品をインターネットで販売し、合計で大きな売上を得るビジネスモデル。',t:'recall'},
+    {q:'M&Aとは？',a:'Mergers and Acquisitions。企業の合併・買収。',t:'recall'},
+    {q:'ベンチマーキングとは？',a:'優れた他社の製品・サービス・業務プロセスを調査・比較し、自社改善の参考にする手法。',t:'recall'},
+    {q:'TOBとは？',a:'株式公開買い付け。市場外で不特定多数の株主から株式を買い集めること。',t:'recall'},
+    {q:'アライアンスとは？',a:'複数の企業が資本関係なしに業務提携・協力関係を結ぶこと。',t:'recall'},
+    {q:'機械学習の教師あり学習とは？',a:'正解ラベル付きデータでモデルを訓練する学習方法。分類・回帰問題に使われる。',t:'recall'},
+    {q:'ニッチ戦略とは？',a:'特定の隙間市場に経営資源を集中させ、競合が少ない分野で優位性を獲得する戦略。',t:'recall'},
+  ],
+  'マネジメント': [
+    {q:'WBSとは？',a:'Work Breakdown Structure。プロジェクト作業を階層的に細分化した構成図。',t:'recall'},
+    {q:'ガントチャートとは？',a:'プロジェクトのスケジュールを横棒グラフで表した図。作業の開始・終了・進捗を視覚的に管理できる。',t:'recall'},
+    {q:'クリティカルパスとは？',a:'プロジェクトの全経路中で最も所要時間が長い経路。遅延がプロジェクト全体の遅延に直結する。',t:'recall'},
+    {q:'PMBOKの5つのプロセス群を答えよ',a:'①立上げ ②計画 ③実行 ④監視・コントロール ⑤終結',t:'recall'},
+    {q:'EVM のCPIとは？',a:'Cost Performance Index。EV÷ACで計算。1以上なら予算内、1未満なら予算超過。',t:'recall'},
+    {q:'リスク対応戦略の4つを答えよ',a:'①回避 ②転嫁 ③軽減 ④受容',t:'recall'},
+    {q:'スクラムのスプリントとは？',a:'1〜4週間の短い開発サイクル。終わりに動作するソフトウェアを提供する。',t:'recall'},
+    {q:'ウォーターフォールモデルの欠点は？',a:'後の工程で問題発覚時の手戻りが大きい。',t:'elaboration'},
+    {q:'SLAとは？',a:'Service Level Agreement。サービス品質・範囲・責任を定めた契約。',t:'recall'},
+    {q:'ITILとは？',a:'IT Infrastructure Library。ITサービス管理のベストプラクティス集。',t:'recall'},
+    {q:'インシデント管理と問題管理の違いは？',a:'インシデント管理はサービス中断を素早く復旧させること。問題管理はインシデントの根本原因を特定・排除すること。',t:'elaboration'},
+    {q:'QCDとは？',a:'Quality（品質）・Cost（コスト）・Delivery（納期）の3要素。',t:'recall'},
+    {q:'TDDとは？',a:'Test Driven Development。テストコードを先に書いてから実装する手法。',t:'recall'},
+    {q:'デシジョンテーブルとは？',a:'条件と動作の組み合わせを表形式で整理したもの。複雑なビジネスルールのテスト設計に使う。',t:'recall'},
+    {q:'コンティンジェンシー計画とは？',a:'リスクが顕在化した際の緊急時対応計画。',t:'recall'},
+    {q:'スパイラルモデルとは？',a:'プロトタイプを繰り返し作りながら開発を進めるモデル。リスク分析を重視する。',t:'recall'},
+    {q:'レビューでウォークスルーとインスペクションの違いは？',a:'ウォークスルーは作成者が説明する非公式な手法。インスペクションはモデレーターが仕切る公式な手法。',t:'elaboration'},
+    {q:'変更管理プロセスの目的は？',a:'ITサービスへの変更リスクを最小化しながら安全・効率的に変更を実施する。',t:'recall'},
+    {q:'キャパシティ管理とは？',a:'現在および将来のビジネス需要を満たすITリソースの容量を適切に管理・計画すること。',t:'recall'},
+    {q:'プロジェクトマネージャの役割は？',a:'プロジェクトの計画・実行・監視・統制を行い、目標（QCD）を達成する責任者。',t:'recall'},
+  ],
+  'テクノロジ': [
+    {q:'仮想記憶とは？',a:'補助記憶装置の一部を主記憶のように使う技術。実際のメモリ容量より大きなプログラムを実行できる。',t:'recall'},
+    {q:'キャッシュメモリの役割は？',a:'CPUと主記憶の速度差を埋める高速な一時記憶装置。',t:'recall'},
+    {q:'RAID5とは？',a:'データとパリティを複数ディスクに分散して書き込む方式。1台のディスク障害に耐えられる。',t:'recall'},
+    {q:'デッドロックとは？',a:'複数のプロセスが互いにリソースの解放を待ち続け、どのプロセスも進めなくなる状態。',t:'recall'},
+    {q:'スラッシングとは？',a:'仮想記憶でページングが頻繁に発生し、実質的な処理がほとんど行われなくなる現象。',t:'recall'},
+    {q:'コンパイラとインタプリタの違いは？',a:'コンパイラはソースコード全体を機械語に変換してから実行。インタプリタは1行ずつ解釈・実行する。',t:'elaboration'},
+    {q:'オブジェクト指向の3大原則は？',a:'①カプセル化 ②継承 ③ポリモーフィズム',t:'recall'},
+    {q:'スタックとキューの違いは？',a:'スタックはLIFO（後入れ先出し）。キューはFIFO（先入れ先出し）。',t:'recall'},
+    {q:'二分探索の計算量は？',a:'O(log n)。ソート済みデータを半分に絞り込み続ける。',t:'recall'},
+    {q:'クイックソートの平均計算量は？',a:'O(n log n)。ピボットを基準に分割を繰り返す。',t:'recall'},
+    {q:'ハッシュ法の特徴は？',a:'キーをハッシュ関数で変換してアドレスを計算する。平均計算量O(1)と非常に高速。',t:'recall'},
+    {q:'パイプライン処理とは？',a:'命令を複数の段階に分けて各段階を並列に処理する技術。スループットを向上させる。',t:'recall'},
+    {q:'CISCとRISCの違いは？',a:'CISCは複雑な命令セット。RISCは単純命令のみでハードウェアをシンプルにし高速動作を実現。',t:'elaboration'},
+    {q:'DMAとは？',a:'Direct Memory Access。CPUを介さずに入出力装置と主記憶の間で直接データ転送を行う仕組み。',t:'recall'},
+    {q:'2の補数表現とは？',a:'負の整数を2進数で表現する方法。ビットを反転させて1を加えたもの。',t:'recall'},
+    {q:'OSの役割を3つ答えよ',a:'①ハードウェア管理 ②ユーザーインターフェース提供 ③アプリケーションの実行環境提供',t:'recall'},
+    {q:'再帰アルゴリズムとは？',a:'関数が自分自身を呼び出すアルゴリズム。ツリー構造の探索などに使われる。',t:'recall'},
+    {q:'マルチコアプロセッサとは？',a:'1つのCPUチップ内に複数の処理コアを持つプロセッサ。複数の処理を並列実行できる。',t:'recall'},
+    {q:'フリップフロップとは？',a:'1ビットの情報を記憶できる論理回路。レジスタやメモリの基本構成要素。',t:'recall'},
+    {q:'ビッグO記法O(1)の意味は？',a:'データ量に関係なく一定時間で処理が完了することを示す。',t:'recall'},
+  ],
+  'セキュリティ': [
+    {q:'SQLインジェクションとは？対策は？',a:'入力フォームに不正なSQL文を挿入してDBを操作する攻撃。対策はプリペアドステートメントとエスケープ処理。',t:'recall'},
+    {q:'XSSとは？',a:'WebページにスクリプトをDBを操作する攻撃。対策はプリペアドステートメントとエスケープ処理。',t:'recall'},
+    {q:'CSRFとは？',a:'正規ユーザーが意図しないリクエストをWebサービスに送信させる攻撃。',t:'recall'},
+    {q:'DDoS攻撃とは？',a:'多数の端末から標的サーバに大量リクエストを送りサービス不能にする攻撃。',t:'recall'},
+    {q:'公開鍵暗号方式の仕組みは？',a:'公開鍵で暗号化し、対応する秘密鍵でのみ復号できる方式。鍵の配送問題を解決する。',t:'selfexplain'},
+    {q:'デジタル署名の目的は？',a:'送信者の秘密鍵でハッシュ値を暗号化。受信者は公開鍵で検証することで改ざん検知と送信者認証ができる。',t:'elaboration'},
+    {q:'TLS/SSLとは？',a:'通信内容を暗号化するプロトコル。HTTPSはHTTPをTLSで暗号化したもの。',t:'recall'},
+    {q:'ゼロデイ攻撃とは？',a:'脆弱性が公開される前（パッチ提供前）に攻撃者が脆弱性を利用する攻撃。',t:'recall'},
+    {q:'ソーシャルエンジニアリングとは？',a:'人間の心理的・社会的な隙を突いて情報を盗む手法。なりすまし電話・フィッシングメールなど。',t:'recall'},
+    {q:'情報セキュリティの3要素（CIA）は？',a:'①機密性（C）②完全性（I）③可用性（A）',t:'recall'},
+    {q:'WAFとは？',a:'Web Application Firewall。Webアプリへの攻撃を検知・遮断する専用ファイアウォール。',t:'recall'},
+    {q:'多要素認証とは？',a:'「知識」「所持」「生体」などの2つ以上の要素を組み合わせた認証方式。',t:'recall'},
+    {q:'AESとは？',a:'Advanced Encryption Standard。共通鍵暗号方式。現在最も広く使われる対称暗号。',t:'recall'},
+    {q:'ランサムウェアとは？',a:'ファイルを暗号化して使用不能にし、復号と引き換えに身代金を要求するマルウェア。',t:'recall'},
+    {q:'ISMSとは？',a:'情報セキュリティマネジメントシステム。ISO/IEC 27001が国際規格。PDCAで継続的改善を行う。',t:'recall'},
+    {q:'PKIとは？',a:'デジタル証明書を用いて公開鍵の正当性を保証する仕組み。認証局（CA）が証明書を発行する。',t:'recall'},
+    {q:'バックドアとは？',a:'正規の認証を迂回してシステムに侵入するために設けられた不正なアクセス経路。',t:'recall'},
+    {q:'ペネトレーションテストとは？',a:'擬似的に攻撃を行いシステムの脆弱性を発見するセキュリティテスト。',t:'recall'},
+    {q:'不正アクセス禁止法が禁止する行為は？',a:'他人のIDやパスワードを無断使用してコンピュータにアクセスする行為。',t:'recall'},
+    {q:'フィッシングとは？',a:'偽のWebサイトやメールで個人情報・パスワードを騙し取る攻撃手法。',t:'recall'},
+  ],
+  'ネットワーク': [
+    {q:'OSI参照モデルの7層を答えよ',a:'①物理層 ②データリンク層 ③ネットワーク層 ④トランスポート層 ⑤セッション層 ⑥プレゼンテーション層 ⑦アプリケーション層',t:'recall'},
+    {q:'TCPとUDPの違いは？',a:'TCPはコネクション型で信頼性が高い。UDPはコネクションレス型で高速だが信頼性は低い。',t:'elaboration'},
+    {q:'DNSとは？',a:'Domain Name System。ドメイン名とIPアドレスを相互変換する仕組み。',t:'recall'},
+    {q:'DHCPとは？',a:'IPアドレスをネットワーク上の端末に自動的に割り当てるプロトコル。',t:'recall'},
+    {q:'NATとは？',a:'Network Address Translation。プライベートIPとグローバルIPを相互変換する技術。',t:'recall'},
+    {q:'VPNとは？',a:'公衆回線上に暗号化された仮想専用線を構築する技術。',t:'recall'},
+    {q:'ルータとスイッチの違いは？',a:'ルータは第3層（IPアドレス）で異なるネットワーク間を中継。スイッチは第2層（MACアドレス）で同一ネットワーク内を中継。',t:'elaboration'},
+    {q:'ARPとは？',a:'IPアドレスからMACアドレスを取得するプロトコル。',t:'recall'},
+    {q:'SMTPとPOP3の役割は？',a:'SMTPはメール送信プロトコル（25番）。POP3はメール受信プロトコル（110番）。',t:'recall'},
+    {q:'CSMA/CDとは？',a:'イーサネットで使われる媒体アクセス制御方式。衝突発生時はランダムな時間待機して再送する。',t:'recall'},
+    {q:'IPv4とIPv6の違いは？',a:'IPv4は32ビット（約43億アドレス）。IPv6は128ビット（約340澗アドレス）。',t:'elaboration'},
+    {q:'ポート443は何のプロトコル？',a:'HTTPS（HTTP over TLS/SSL）。',t:'recall'},
+    {q:'FTPとは？',a:'File Transfer Protocol。ネットワーク上でファイルを転送するプロトコル。21番ポート。',t:'recall'},
+    {q:'HTTPとHTTPSの違いは？',a:'HTTPはデータを平文で送受信。HTTPSはTLSで暗号化して通信する。',t:'elaboration'},
+    {q:'サブネットマスクの役割は？',a:'IPアドレスをネットワーク部とホスト部に分けるための32ビットの数値。',t:'recall'},
+    {q:'QoSとは？',a:'Quality of Service。ネットワーク上の通信品質を保証・制御する技術。',t:'recall'},
+    {q:'ファイアウォールのパケットフィルタリングとは？',a:'IPアドレス・ポート番号・プロトコルを基準にパケットを制御する機能。',t:'recall'},
+    {q:'TCP/IPの4層モデルを答えよ',a:'①ネットワークインターフェース層 ②インターネット層 ③トランスポート層 ④アプリケーション層',t:'recall'},
+    {q:'IPアドレスのクラスBの範囲は？',a:'128.0.0.0〜191.255.255.255。ネットワーク部16bit・ホスト部16bit。',t:'recall'},
+    {q:'Wi-Fi 6（IEEE 802.11ax）の特徴は？',a:'2.4/5/6GHz帯に対応。多数デバイス環境での効率改善（OFDMA・MU-MIMO）を実現。',t:'recall'},
+  ],
+  'DB': [
+    {q:'正規化の目的は？',a:'データの冗長性を排除し、更新異常を防ぐこと。',t:'recall'},
+    {q:'第1正規形の条件は？',a:'繰り返し項目を排除し、すべての属性が単一の値を持つこと。',t:'recall'},
+    {q:'第3正規形の条件は？',a:'第2正規形を満たし、推移関数従属を排除した状態。',t:'recall'},
+    {q:'INNER JOINとOUTER JOINの違いは？',a:'INNER JOINは両テーブルに一致するレコードのみ返す。OUTER JOINは一致しないレコードも返す。',t:'elaboration'},
+    {q:'トランザクションのACID特性は？',a:'①Atomicity（原子性）②Consistency（一貫性）③Isolation（独立性）④Durability（永続性）',t:'recall'},
+    {q:'インデックスの役割と欠点は？',a:'検索速度を向上させる。ただし更新時のオーバーヘッドが増加し、ディスク容量も消費する。',t:'elaboration'},
+    {q:'ビュー（VIEW）とは？',a:'SELECT文の結果を仮想的なテーブルとして定義したもの。実データは持たない。',t:'recall'},
+    {q:'ストアドプロシージャとは？',a:'データベース内にあらかじめ格納されたSQL手続き。',t:'recall'},
+    {q:'NoSQLの特徴は？',a:'スキーマが柔軟で大量データの高速処理に適する。MongoDB・Redis・Cassandraなど。',t:'recall'},
+    {q:'E-R図の目的は？',a:'エンティティと関連を視覚的に表現するデータベース設計のモデリング手法。',t:'recall'},
+    {q:'GROUP BY句の役割は？',a:'指定した列の値でレコードをグループ化し、集計関数をグループごとに適用できる。',t:'recall'},
+    {q:'2相コミットとは？',a:'分散DBでのトランザクション整合性を保つ手法。①準備フェーズ②コミットフェーズの2段階。',t:'recall'},
+    {q:'デッドロックをDBで防ぐ方法は？',a:'ロック取得順序を統一する・タイムアウトを設定する・デッドロック検出後にロールバックする。',t:'elaboration'},
+    {q:'第2正規形の条件は？',a:'第1正規形を満たし、主キーの一部に対する部分関数従属を排除した状態。',t:'recall'},
+    {q:'カーソルとは？（DB用語）',a:'SELECT文の結果セットを1行ずつ処理するためのポインタ。',t:'recall'},
+  ],
+  'ハードウェア': [
+    {q:'DRAMとSRAMの違いは？',a:'DRAMはコンデンサで記憶・リフレッシュ必要で低コスト。SRAMはフリップフロップで高速だが高コスト。',t:'elaboration'},
+    {q:'フラッシュメモリの特徴は？',a:'電気的に書き込み・消去できる不揮発性メモリ。USBメモリやSSDに使われる。',t:'recall'},
+    {q:'HDDとSSDの違いは？',a:'HDDは磁気ディスクを物理的に回転。SSDはフラッシュメモリを使い電子的に処理。SSDは高速・耐衝撃性に優れる。',t:'elaboration'},
+    {q:'UPSの目的は？',a:'停電・電圧変動時にバッテリーで一時的に電力を供給し、システムへの影響を防ぐ装置。',t:'recall'},
+    {q:'ホットスワップとは？',a:'電源を入れたままハードウェアの着脱・交換ができる機能。',t:'recall'},
+    {q:'GPUが機械学習に向いている理由は？',a:'並列処理を得意とする多数のコアを持つ。ニューラルネットワークの行列演算を大量並列で処理できる。',t:'elaboration'},
+    {q:'QRコードとバーコードの違いは？',a:'バーコードは1次元で数十文字。QRコードは2次元で数千文字を格納でき、誤り訂正機能もある。',t:'elaboration'},
+    {q:'IoTデバイスのセキュリティリスクは？',a:'処理能力が低くセキュリティ機能が不十分なものも多く、踏み台攻撃・ボットネット化のリスクがある。',t:'elaboration'},
+    {q:'USB 3.0の転送速度は？',a:'最大5Gbps（SuperSpeed USB）。USB 2.0（480Mbps）の約10倍。',t:'recall'},
+    {q:'マルチコアプロセッサとは？',a:'1つのCPUチップ内に複数の処理コアを持つプロセッサ。',t:'recall'},
+  ],
+  'アルゴリズム': [
+    {q:'線形探索の計算量は？',a:'O(n)。データを先頭から順番に比較していく。',t:'recall'},
+    {q:'二分探索の計算量は？',a:'O(log n)。ソート済みデータを半分に絞り込み続ける。',t:'recall'},
+    {q:'バブルソートの計算量は？',a:'O(n²)。隣接要素を比較・交換を繰り返す。',t:'recall'},
+    {q:'マージソートの計算量と特徴は？',a:'平均・最悪ともO(n log n)。安定ソート。追加メモリが必要。',t:'recall'},
+    {q:'DFSの3種類は？',a:'①前順（根→左→右）②中順（左→根→右）③後順（左→右→根）',t:'recall'},
+    {q:'BFSとDFSの違いは？',a:'BFSはキューを使い近いノードから探索。DFSはスタック（再帰）を使い深くまで探索。',t:'elaboration'},
+    {q:'動的計画法とは？',a:'問題を部分問題に分解し、部分問題の解をメモ化して再利用することで全体を効率的に解く手法。',t:'recall'},
+    {q:'ダイクストラ法とは？',a:'重み付きグラフの単一始点最短経路を求めるアルゴリズム。負の重みは扱えない。',t:'recall'},
+    {q:'ヒープとは？',a:'親ノードが子ノードより常に大きい（または小さい）完全二分木。優先度キューの実装に使われる。',t:'recall'},
+    {q:'スタックオーバーフローとは？',a:'再帰呼び出しやローカル変数の多用でスタックメモリが枯渇する現象。',t:'recall'},
+    {q:'フローチャートの菱形が表すものは？',a:'条件分岐（判断）。真偽によって処理の流れが分かれる部分。',t:'recall'},
+    {q:'ハッシュ法の平均計算量は？',a:'O(1)。キーをハッシュ関数で変換してアドレスを計算するため非常に高速。',t:'recall'},
+  ]
+};
+
+var TINFO = {
+  recall:      {label:'リコール',  color:'#1D4ED8', bg:'#EFF6FF'},
+  elaboration: {label:'精緻化',    color:'#6D28D9', bg:'#F5F3FF'},
+  selfexplain: {label:'自己説明',  color:'#B45309', bg:'#FFFBEB'}
+};
+
+// ══════════════════════════════════════
+// SM-2
+// ══════════════════════════════════════
+function sm2(c, g) {
+  var ef = c.ef||2.5, interval = c.interval||1, reps = c.reps||0;
+  if (g < 2) { reps=0; interval=1; }
+  else { interval = reps===0?1:reps===1?6:Math.round(interval*ef); reps++; }
+  ef = Math.max(1.3, ef+0.1-(3-g)*(0.08+(3-g)*0.02));
+  var d = new Date(); d.setDate(d.getDate()+interval);
+  return {ef:ef, interval:interval, reps:reps, nextReview:d.toISOString().split('T')[0]};
+}
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function save() { try { localStorage.setItem('fe_c', JSON.stringify(cards)); } catch(e){} }
+function getKey() { return localStorage.getItem('fe_k') || ''; }
+
+// ══════════════════════════════════════
+// 画面遷移
+// ══════════════════════════════════════
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  if (id === 's-built') renderBuilt();
+  if (id === 's-settings') renderKeyStatus();
+  if (id === 's-add') {
+    var warn = document.getElementById('api-warn');
+    if (warn) warn.style.display = getKey() ? 'none' : 'block';
+  }
+}
+
+// ══════════════════════════════════════
+// ホーム
+// ══════════════════════════════════════
+var currentCat = 'all';
+
+function renderHome() {
+  var filtered = currentCat==='all' ? cards : cards.filter(function(c){ return c.cat===currentCat; });
+  var due = filtered.filter(function(c){ return c.nextReview <= todayStr(); });
+  var mastered = filtered.filter(function(c){ return (c.reps||0) >= 3; });
+
+  document.getElementById('sn-total').textContent = filtered.length;
+  document.getElementById('sn-due').textContent = due.length;
+  document.getElementById('sn-master').textContent = mastered.length;
+
+  var stDue = document.getElementById('st-due');
+  stDue.className = 'stat' + (due.length > 0 ? ' hi' : '');
+
+  var btnStart = document.getElementById('btn-start');
+  btnStart.disabled = due.length === 0;
+  btnStart.textContent = due.length > 0 ? ('復習を始める（' + due.length + '問）') : '今日の復習はありません';
+
+  // カテゴリフィルター
+  var catRow = document.getElementById('cat-row');
+  var cats = ['all'].concat(Object.keys(BUILT));
+  catRow.innerHTML = cats.map(function(cat){
+    var label = cat === 'all' ? 'すべて' : cat;
+    var on = cat === currentCat;
+    return '<button class="cat-pill' + (on?' on':'') + '" onclick="setCat(\'' + cat + '\')">' + label + '</button>';
+  }).join('');
+
+  // 最近の問題
+  var rw = document.getElementById('recent-wrap');
+  var rl = document.getElementById('recent-list');
+  if (cards.length === 0) { rw.style.display='none'; return; }
+  rw.style.display = 'block';
+  var recent = cards.slice().reverse().slice(0,5);
+  rl.innerHTML = recent.map(function(c){
+    var ti = TINFO[c.type] || TINFO.recall;
+    var isDue = c.nextReview <= todayStr();
+    return '<div class="card-item">' +
+      '<span class="tbadge" style="color:'+ti.color+';background:'+ti.bg+'">'+ti.label+'</span>' +
+      '<span class="tbadge" style="background:#F1F5F9;color:#64748B">'+c.cat+'</span>' +
+      '<span class="cq">'+c.q+'</span>' +
+      '<span class="cd'+(isDue?' due':'')+'">'+( isDue?'今日！':c.nextReview.slice(5))+'</span>' +
+      '</div>';
+  }).join('');
+}
+
+function setCat(cat) {
+  currentCat = cat;
+  renderHome();
+}
+
+// ══════════════════════════════════════
+// 内蔵問題
+// ══════════════════════════════════════
+function renderBuilt() {
+  var bl = document.getElementById('built-list');
+  bl.innerHTML = Object.keys(BUILT).map(function(cat){
+    var qs = BUILT[cat];
+    var added = cards.filter(function(c){ return c.cat===cat; }).length;
+    var pct = Math.min(100, Math.round((added/qs.length)*100));
+    var isDone = added >= qs.length;
+    return '<div class="built-item">' +
+      '<div class="built-item-info">' +
+        '<div class="built-item-name">'+cat+'</div>' +
+        '<div class="prog-mini"><div class="prog-mini-fill" style="width:'+pct+'%"></div></div>' +
+        '<div style="font-size:10px;color:#94A3B8;margin-top:3px">'+added+'/'+qs.length+'問追加済み</div>' +
+      '</div>' +
+      '<button class="add-btn '+(isDone?'done':'todo')+'" onclick="addBuilt(\''+cat+'\')">'+( isDone?'追加済み':'追加する')+'</button>' +
+      '</div>';
+  }).join('');
+}
+
+function addBuilt(cat) {
+  var qs = BUILT[cat];
+  var existing = {};
+  cards.filter(function(c){ return c.cat===cat; }).forEach(function(c){ existing[c.q]=1; });
+  var newCards = qs.filter(function(item){ return !existing[item.q]; }).map(function(item, i){
+    return { id: Date.now()+i, q:item.q, a:item.a, type:item.t, cat:cat,
+             ef:2.5, interval:1, reps:0, nextReview:todayStr() };
+  });
+  if (!newCards.length) { alert('このカテゴリはすべて追加済みです'); return; }
+  cards = cards.concat(newCards);
+  save();
+  renderBuilt();
+  renderHome();
+  alert('✅ ' + cat + 'から' + newCards.length + '問を追加しました！');
+}
+
+// ══════════════════════════════════════
+// 手動追加
+// ══════════════════════════════════════
+function switchTab(t) {
+  document.getElementById('panel-m').style.display = t==='m' ? 'block' : 'none';
+  document.getElementById('panel-a').style.display = t==='a' ? 'block' : 'none';
+  document.getElementById('tab-m').className = 'tab ' + (t==='m'?'on':'off');
+  document.getElementById('tab-a').className = 'tab ' + (t==='a'?'on':'off');
+  if (t==='a') {
+    var warn = document.getElementById('api-warn');
+    if (warn) warn.style.display = getKey() ? 'none' : 'block';
+  }
+}
+
+function addManual() {
+  var q = document.getElementById('m-q').value.trim();
+  var a = document.getElementById('m-a').value.trim();
+  var cat = document.getElementById('m-cat').value;
+  var typeEl = document.querySelector('input[name="m-type"]:checked');
+  var type = typeEl ? typeEl.value : 'recall';
+  if (!q || !a) { alert('問題文と解答を入力してください'); return; }
+  cards.push({ id:Date.now(), q:q, a:a, type:type, cat:cat, ef:2.5, interval:1, reps:0, nextReview:todayStr() });
+  save();
+  document.getElementById('m-q').value = '';
+  document.getElementById('m-a').value = '';
+  var msg = document.getElementById('m-msg');
+  msg.style.display = 'block'; msg.style.color = '#059669';
+  msg.textContent = '✅ 追加しました！続けて入力できます';
+  renderHome();
+  setTimeout(function(){ msg.style.display='none'; }, 2500);
+}
+
+// ══════════════════════════════════════
+// AI生成
+// ══════════════════════════════════════
+var aiGenerated = [];
+
+function generateAI() {
+  var text = document.getElementById('a-text').value.trim();
+  if (!text) { alert('テキストを入力してください'); return; }
+  var apiKey = getKey();
+  if (!apiKey) { alert('APIキーが未設定です。⚙️ API設定から設定してください。'); goTo('s-settings'); return; }
+  var count = document.getElementById('a-count').value;
+  var cat = document.getElementById('a-cat').value;
+  var btn = document.getElementById('btn-ai-gen');
+  var msg = document.getElementById('a-msg');
+  btn.disabled = true;
+  msg.style.display = 'block'; msg.style.color = '#64748B';
+  msg.textContent = 'AIが問題を生成中…';
+  document.getElementById('a-preview').style.display = 'none';
+
+  var prompt = '基本情報技術者試験の「'+cat+'」分野に関する問題を'+count+'問生成してください。種類をミックス（recall/elaboration/selfexplain）。JSONのみ返すこと（```不要）:\n{"cards":[{"type":"recall","q":"問題文","a":"解答"}]}\nテキスト:\n'+text;
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://api.anthropic.com/v1/messages', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.setRequestHeader('x-api-key', apiKey);
+  xhr.setRequestHeader('anthropic-version', '2023-06-01');
+  xhr.setRequestHeader('anthropic-dangerous-direct-browser-access', 'true');
+  xhr.timeout = 30000;
+  xhr.onload = function() {
+    btn.disabled = false;
+    if (xhr.status >= 200 && xhr.status < 300) {
+      try {
+        var d = JSON.parse(xhr.responseText);
+        var raw = d.content.map(function(b){ return b.text||''; }).join('').replace(/```json|```/g,'').trim();
+        aiGenerated = JSON.parse(raw).cards;
+        var ti_map = TINFO;
+        document.getElementById('a-preview-list').innerHTML = aiGenerated.map(function(c,i){
+          var ti = ti_map[c.type] || ti_map.recall;
+          return '<div class="preview-card">' +
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">' +
+              '<span class="tbadge" style="color:'+ti.color+';background:'+ti.bg+'">'+ti.label+'</span>' +
+              '<span style="font-size:10px;color:#94A3B8">'+(i+1)+'/'+aiGenerated.length+'</span></div>' +
+            '<div style="font-size:13px;font-weight:600;color:#1E293B;margin-bottom:4px">'+c.q+'</div>' +
+            '<div style="font-size:12px;color:#64748B;line-height:1.6">'+c.a+'</div></div>';
+        }).join('');
+        document.getElementById('a-preview').style.display = 'block';
+        msg.style.color = '#059669';
+        msg.textContent = '✅ ' + aiGenerated.length + '問を生成しました。確認して追加してください。';
+      } catch(e) {
+        msg.style.color = '#DC2626';
+        msg.textContent = '❌ 解析エラー: ' + e.message;
+      }
+    } else {
+      msg.style.color = '#DC2626';
+      var errDetail = '';
+      try { errDetail = JSON.parse(xhr.responseText).error.message; } catch(e){}
+      if (xhr.status === 401) {
+        msg.textContent = '❌ APIキーが無効です（401）。⚙️ API設定で再設定してください。';
+      } else {
+        msg.textContent = '❌ エラー(' + xhr.status + ')' + (errDetail ? ': ' + errDetail : '');
+      }
+    }
+  };
+  xhr.onerror = function() {
+    btn.disabled = false;
+    msg.style.color = '#DC2626';
+    msg.textContent = '❌ 通信エラー。インターネット接続を確認してください。file://で開いている場合はCORSエラーの可能性があります。';
+  };
+  xhr.ontimeout = function() {
+    btn.disabled = false;
+    msg.style.color = '#DC2626';
+    msg.textContent = '❌ タイムアウト。もう一度お試しください。';
+  };
+  xhr.send(JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1500, messages:[{role:'user',content:prompt}] }));
+}
+
+function confirmAI() {
+  var cat = document.getElementById('a-cat').value;
+  var newCards = aiGenerated.map(function(c,i){
+    return { id:Date.now()+i, q:c.q, a:c.a, type:c.type||'recall', cat:cat, ef:2.5, interval:1, reps:0, nextReview:todayStr() };
+  });
+  cards = cards.concat(newCards);
+  save(); renderHome();
+  aiGenerated = [];
+  document.getElementById('a-text').value = '';
+  document.getElementById('a-preview').style.display = 'none';
+  var msg = document.getElementById('a-msg');
+  msg.style.color = '#059669';
+  msg.textContent = '✅ ' + newCards.length + '問を追加しました！';
+  setTimeout(function(){ goTo('s-home'); }, 1200);
+}
+
+function cancelAI() {
+  aiGenerated = [];
+  document.getElementById('a-preview').style.display = 'none';
+  document.getElementById('a-msg').style.display = 'none';
+}
+
+// ══════════════════════════════════════
+// APIキー設定
+// ══════════════════════════════════════
+function saveKey() {
+  var raw = document.getElementById('key-input').value;
+  var key = raw.replace(/\s/g,'');
+  var msg = document.getElementById('key-msg');
+  if (!key.startsWith('sk-ant-')) {
+    msg.style.display='block'; msg.style.color='#DC2626';
+    msg.textContent='❌ 正しいAPIキーを入力してください（sk-ant-...）'; return;
+  }
+  localStorage.setItem('fe_k', key);
+  document.getElementById('key-input').value = key;
+  msg.style.display='block'; msg.style.color='#059669';
+  msg.textContent='✅ 保存しました！AI生成が使えるようになりました。';
+  renderKeyStatus();
+  setTimeout(function(){ goTo('s-home'); }, 1500);
+}
+
+function clearKey() {
+  if (!confirm('APIキーを削除しますか？')) return;
+  localStorage.removeItem('fe_k');
+  document.getElementById('key-input').value = '';
+  renderKeyStatus();
+}
+
+function renderKeyStatus() {
+  var key = getKey();
+  var el = document.getElementById('key-status');
+  if (!el) return;
+  if (key) {
+    el.innerHTML = '<span style="color:#059669;font-weight:600">✅ 設定済み</span> <span style="font-size:11px;color:#94A3B8">'+key.slice(0,14)+'...'+key.slice(-4)+'（全'+key.length+'文字）</span>';
+    document.getElementById('key-input').value = key;
+  } else {
+    el.innerHTML = '<span style="color:#DC2626">❌ 未設定</span>';
+  }
+}
+
+// ══════════════════════════════════════
+// セッション
+// ══════════════════════════════════════
+var queue = [], qi = 0;
+
+function startSession() {
+  var filtered = currentCat==='all' ? cards : cards.filter(function(c){ return c.cat===currentCat; });
+  var due = filtered.filter(function(c){ return c.nextReview <= todayStr(); });
+  if (!due.length) return;
+  queue = due.slice().sort(function(){ return Math.random()-0.5; });
+  qi = 0;
+  showCard();
+  goTo('s-session');
+}
+
+function showCard() {
+  var c = queue[qi];
+  var ti = TINFO[c.type] || TINFO.recall;
+  var pct = Math.round((qi/queue.length)*100);
+  document.getElementById('pfill').style.width = pct + '%';
+  document.getElementById('ptxt').textContent = (qi+1) + '/' + queue.length;
+  var ttag = document.getElementById('type-tag');
+  ttag.textContent = ti.label; ttag.style.color = ti.color; ttag.style.background = ti.bg;
+  document.getElementById('cat-tag').textContent = c.cat || '';
+  document.getElementById('reps-tag').textContent = (c.reps||0) > 0 ? '復習'+(c.reps||0)+'回目' : '';
+  document.getElementById('qtxt').textContent = c.q;
+  document.getElementById('u-ans').value = '';
+  document.getElementById('u-exp').value = '';
+  document.getElementById('ph-think').style.display = 'block';
+  document.getElementById('ph-load').style.display = 'none';
+  document.getElementById('ph-exp').style.display = 'none';
+  document.getElementById('f-box').style.display = 'none';
+  var br = document.getElementById('btn-rev');
+  br.disabled = true;
+  document.getElementById('u-ans').oninput = function(){ br.disabled = !this.value.trim(); };
+}
+
+function revealAnswer() {
+  var c = queue[qi];
+  var ua = document.getElementById('u-ans').value;
+  document.getElementById('ph-think').style.display = 'none';
+  document.getElementById('ph-load').style.display = 'block';
+  document.getElementById('a-txt').textContent = c.a;
+
+  var apiKey = getKey();
+  if (!apiKey) {
+    document.getElementById('ph-load').style.display = 'none';
+    document.getElementById('ph-exp').style.display = 'block';
+    return;
+  }
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://api.anthropic.com/v1/messages', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.setRequestHeader('x-api-key', apiKey);
+  xhr.setRequestHeader('anthropic-version', '2023-06-01');
+  xhr.setRequestHeader('anthropic-dangerous-direct-browser-access', 'true');
+  xhr.timeout = 15000;
+  xhr.onload = function() {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      try {
+        var d = JSON.parse(xhr.responseText);
+        document.getElementById('f-txt').textContent = d.content[0].text;
+        document.getElementById('f-box').style.display = 'block';
+      } catch(e){}
+    }
+    document.getElementById('ph-load').style.display = 'none';
+    document.getElementById('ph-exp').style.display = 'block';
+  };
+  xhr.onerror = xhr.ontimeout = function() {
+    document.getElementById('ph-load').style.display = 'none';
+    document.getElementById('ph-exp').style.display = 'block';
+  };
+  var prompt = '基本情報技術者試験の問題フィードバックを1〜2文で日本語で。\n問題:'+c.q+'\n正解:'+c.a+'\n回答:'+ua;
+  xhr.send(JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:200, messages:[{role:'user',content:prompt}] }));
+}
+
+function gradeCard(g) {
+  var c = queue[qi];
+  var upd = sm2(c, g);
+  cards = cards.map(function(card){ return card.id===c.id ? Object.assign({},card,upd) : card; });
+  save();
+  if (qi+1 < queue.length) {
+    qi++;
+    showCard();
+  } else {
+    var mastered = cards.filter(function(c){ return (c.reps||0)>=3; }).length;
+    var nextDates = cards.filter(function(c){ return c.nextReview > todayStr(); }).map(function(c){ return c.nextReview; }).sort();
+    document.getElementById('d-count').textContent = queue.length + '問';
+    document.getElementById('d-master').textContent = mastered + '問';
+    document.getElementById('d-next').textContent = nextDates[0] ? nextDates[0].slice(5) : 'なし';
+    goTo('s-done');
+    renderHome();
+  }
+}
+
+// ══════════════════════════════════════
+// 初期化
+// ══════════════════════════════════════
+renderHome();
+</script>
+</body>
+</html>
