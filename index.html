@@ -67,6 +67,7 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
 .cat-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .cat-pill{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid #E2E8F0 !important;background:#fff;color:#64748B;width:auto}
 .cat-pill.on{background:#1E293B;color:#fff;border-color:#1E293B !important}
+.sync-bar{font-size:11px;text-align:right;margin-bottom:6px;min-height:16px}
 </style>
 </head>
 <body>
@@ -74,12 +75,12 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
 
 <!-- ホーム -->
 <div id="s-home" class="screen active">
-  <div style="margin-bottom:20px">
+  <div style="margin-bottom:16px">
     <div style="font-size:10px;letter-spacing:3px;color:#94A3B8;margin-bottom:4px">FE EXAM · STUDY APP</div>
     <h1>基本情報技術者 対策</h1>
     <span class="sub">分散学習 · リコール · 精緻化 · 自己説明</span>
   </div>
-  <div id="sync-status" style="font-size:11px;color:#059669;margin-bottom:8px;text-align:right"></div>
+  <div class="sync-bar" id="sync-status"></div>
   <div class="stat-row">
     <div class="stat" id="st-total"><div class="stat-n" id="sn-total">0</div><div class="stat-l">総問題</div></div>
     <div class="stat" id="st-due"><div class="stat-n" id="sn-due">0</div><div class="stat-l">今日の復習</div></div>
@@ -114,8 +115,6 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
     <button class="tab on" id="tab-m" onclick="switchTab('m')">手動で追加</button>
     <button class="tab off" id="tab-a" onclick="switchTab('a')">AIで自動生成</button>
   </div>
-
-  <!-- 手動 -->
   <div id="panel-m">
     <div style="margin-bottom:10px"><label>カテゴリ</label>
       <select id="m-cat"><option>ストラテジ</option><option>マネジメント</option><option>テクノロジ</option><option>セキュリティ</option><option>ネットワーク</option><option>DB</option><option>ハードウェア</option><option>アルゴリズム</option><option>その他</option></select></div>
@@ -132,10 +131,8 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
     <button class="bp" onclick="addManual()">この問題を追加する</button>
     <div class="msg" id="m-msg"></div>
   </div>
-
-  <!-- AI -->
   <div id="panel-a" style="display:none">
-    <div id="api-warn" class="warn" style="display:none">⚠️ APIキーが未設定です。<span style="color:#1D4ED8;cursor:pointer;text-decoration:underline" onclick="goTo('s-settings')">⚙️ API設定</span>からAPIキーを設定してください。</div>
+    <div id="api-warn" class="warn" style="display:none">⚠️ APIキーが未設定です。<span style="color:#1D4ED8;cursor:pointer;text-decoration:underline" onclick="goTo('s-settings')">⚙️ API設定</span>から設定してください。</div>
     <div style="margin-bottom:10px"><label>カテゴリ</label>
       <select id="a-cat"><option>ストラテジ</option><option>マネジメント</option><option>テクノロジ</option><option>セキュリティ</option><option>ネットワーク</option><option>DB</option><option>ハードウェア</option><option>アルゴリズム</option><option>その他</option></select></div>
     <div style="margin-bottom:10px"><label>覚えたいテキスト</label><textarea id="a-text" rows="7" placeholder="教科書・ノートの内容を貼り付けてください"></textarea></div>
@@ -182,6 +179,26 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
   </div>
 </div>
 
+<!-- 同期 -->
+<div id="s-sync" class="screen">
+  <button class="bb" onclick="goTo('s-home')">← 戻る</button>
+  <h2>データの同期</h2>
+  <p style="font-size:12px;color:#64748B;margin-bottom:16px;line-height:1.7">Firebaseでリアルタイム同期中です。問題を追加すると自動でスマホ・PC両方に反映されます。</p>
+  <div style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:14px;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:6px">📤 バックアップ（エクスポート）</div>
+    <p style="font-size:12px;color:#64748B;margin-bottom:10px;line-height:1.6">全データをJSONファイルとして保存します。</p>
+    <div id="export-info" style="font-size:12px;color:#64748B;margin-bottom:10px"></div>
+    <button class="bp" onclick="exportData()">JSONでエクスポートする</button>
+  </div>
+  <div style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:14px">
+    <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:6px">📥 インポート</div>
+    <p style="font-size:12px;color:#64748B;margin-bottom:10px;line-height:1.6">JSONファイルを読み込んでFirebaseに同期します。</p>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="bs" onclick="document.getElementById('import-file').click()">JSONファイルを選択する</button>
+    <div class="msg" id="import-msg"></div>
+  </div>
+</div>
+
 <!-- セッション -->
 <div id="s-session" class="screen">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
@@ -194,15 +211,12 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
     <span style="font-size:10px;color:#94A3B8" id="reps-tag"></span>
   </div>
   <div class="qcard"><p class="qtxt" id="qtxt"></p></div>
-
   <div id="ph-think">
     <span class="hint">📝 ノートを見ずに思い出して書いてください</span>
     <textarea id="u-ans" rows="3" placeholder="答えを書いてみましょう..."></textarea>
     <div style="margin-top:8px"><button class="bp" id="btn-rev" onclick="revealAnswer()" disabled>答えを確認する →</button></div>
   </div>
-
   <div id="ph-load" style="display:none;text-align:center;padding:24px 0;color:#64748B;font-size:13px">確認中...</div>
-
   <div id="ph-exp" style="display:none">
     <div class="abox"><div class="albl">正解・解説</div><div class="atxt" id="a-txt"></div></div>
     <div class="fbox" id="f-box" style="display:none"><div class="flbl">AIフィードバック</div><div class="ftxt" id="f-txt"></div></div>
@@ -215,35 +229,6 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
       <button class="gb" style="background:#DBEAFE;color:#2563EB;border-color:#2563EB30 !important" onclick="gradeCard(2)">思い出せた</button>
       <button class="gb" style="background:#D1FAE5;color:#059669;border-color:#05966930 !important" onclick="gradeCard(3)">完璧！</button>
     </div>
-  </div>
-</div>
-
-<!-- 同期 -->
-<div id="s-sync" class="screen">
-  <button class="bb" onclick="goTo('s-home')">← 戻る</button>
-  <h2>データの同期</h2>
-  <p style="font-size:12px;color:#64748B;margin-bottom:16px;line-height:1.7">スマホとPCでデータを共有できます。エクスポートしたファイルを別の端末でインポートしてください。</p>
-
-  <div style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:14px;margin-bottom:12px">
-    <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:6px">📤 エクスポート</div>
-    <p style="font-size:12px;color:#64748B;margin-bottom:10px;line-height:1.6">現在の全データ（問題・復習履歴）をJSONファイルとして保存します。</p>
-    <div id="export-info" style="font-size:12px;color:#64748B;margin-bottom:10px"></div>
-    <button class="bp" onclick="exportData()">データをエクスポートする</button>
-  </div>
-
-  <div style="background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:14px;margin-bottom:12px">
-    <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:6px">📥 インポート</div>
-    <p style="font-size:12px;color:#64748B;margin-bottom:10px;line-height:1.6">エクスポートしたJSONファイルを読み込みます。<span style="color:#DC2626;font-weight:600">現在のデータに追加されます（上書きではありません）。</span></p>
-    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
-    <button class="bs" onclick="document.getElementById('import-file').click()">JSONファイルを選択する</button>
-    <div class="msg" id="import-msg"></div>
-  </div>
-
-  <div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:10px;padding:12px;font-size:12px;color:#92400E;line-height:1.7">
-    💡 <b>使い方：</b><br>
-    ① スマホで「エクスポート」→ JSONファイルをGoogle Driveなどに保存<br>
-    ② PCで同じURLを開く → 「インポート」→ JSONファイルを選択<br>
-    ③ PC→スマホも同様
   </div>
 </div>
 
@@ -263,13 +248,15 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
 </div>
 
 </div>
-<script type="module">
+
+<!-- Firebase SDK（通常のscriptタグで読み込み） -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
 // ══════════════════════════════════════
 // Firebase 初期化
 // ══════════════════════════════════════
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
 var firebaseConfig = {
   apiKey: "AIzaSyDttlu6ZSo5A-7rEcoAhdL1JbUPyR_cjq0",
   authDomain: "fe-study-185b7.firebaseapp.com",
@@ -279,43 +266,10 @@ var firebaseConfig = {
   messagingSenderId: "261295327147",
   appId: "1:261295327147:web:6d0a21211e77e33b0d74ee"
 };
+firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
+var USER_ID = 'user_main';
 
-var fbApp = initializeApp(firebaseConfig);
-var db = getDatabase(fbApp);
-var USER_ID = 'user_main'; // 1人で使う想定なので固定ID
-
-// Firebaseからデータを読み込む
-function loadFromFirebase() {
-  var cardsRef = ref(db, USER_ID + '/cards');
-  onValue(cardsRef, function(snapshot) {
-    var data = snapshot.val();
-    if (data) {
-      // Firebase側が新しければ上書き
-      var fbCards = Object.values(data);
-      if (fbCards.length > cards.length) {
-        cards = fbCards;
-        try { localStorage.setItem('fe_c', JSON.stringify(cards)); } catch(e){}
-      }
-    }
-    renderHome();
-  });
-}
-
-// Firebaseにデータを保存する
-function saveToFirebase() {
-  var obj = {};
-  cards.forEach(function(c){ obj[c.id] = c; });
-  set(ref(db, USER_ID + '/cards'), obj).catch(function(e){ console.log('Firebase保存エラー:', e); });
-}
-
-// save関数をオーバーライド（localStorageとFirebase両方に保存）
-var _origSave = save;
-save = function() {
-  try { localStorage.setItem('fe_c', JSON.stringify(cards)); } catch(e){}
-  saveToFirebase();
-};
-
-// 同期ステータス表示
 function showSyncStatus(msg, color) {
   var el = document.getElementById('sync-status');
   if (el) { el.textContent = msg; el.style.color = color || '#059669'; }
@@ -396,7 +350,7 @@ var BUILT = {
   ],
   'セキュリティ': [
     {q:'SQLインジェクションとは？対策は？',a:'入力フォームに不正なSQL文を挿入してDBを操作する攻撃。対策はプリペアドステートメントとエスケープ処理。',t:'recall'},
-    {q:'XSSとは？',a:'WebページにスクリプトをDBを操作する攻撃。対策はプリペアドステートメントとエスケープ処理。',t:'recall'},
+    {q:'XSSとは？',a:'WebページにスクリプトをDBを操作する攻撃。悪意あるスクリプトを埋め込み閲覧者のブラウザで実行させる。',t:'recall'},
     {q:'CSRFとは？',a:'正規ユーザーが意図しないリクエストをWebサービスに送信させる攻撃。',t:'recall'},
     {q:'DDoS攻撃とは？',a:'多数の端末から標的サーバに大量リクエストを送りサービス不能にする攻撃。',t:'recall'},
     {q:'公開鍵暗号方式の仕組みは？',a:'公開鍵で暗号化し、対応する秘密鍵でのみ復号できる方式。鍵の配送問題を解決する。',t:'selfexplain'},
@@ -502,8 +456,17 @@ function sm2(c, g) {
 }
 
 function todayStr() { return new Date().toISOString().split('T')[0]; }
-function save() { try { localStorage.setItem('fe_c', JSON.stringify(cards)); } catch(e){} }
 function getKey() { return localStorage.getItem('fe_k') || ''; }
+
+// ══════════════════════════════════════
+// Firebase保存
+// ══════════════════════════════════════
+function save() {
+  try { localStorage.setItem('fe_c', JSON.stringify(cards)); } catch(e){}
+  var obj = {};
+  cards.forEach(function(c){ obj[c.id] = c; });
+  db.ref(USER_ID + '/cards').set(obj).catch(function(e){ console.log('Firebase保存エラー:', e); });
+}
 
 // ══════════════════════════════════════
 // 画面遷移
@@ -516,6 +479,10 @@ function goTo(id) {
   if (id === 's-add') {
     var warn = document.getElementById('api-warn');
     if (warn) warn.style.display = getKey() ? 'none' : 'block';
+  }
+  if (id === 's-sync') {
+    var info = document.getElementById('export-info');
+    if (info) info.textContent = '現在 ' + cards.length + '問が保存されています。';
   }
 }
 
@@ -532,37 +499,28 @@ function renderHome() {
   document.getElementById('sn-total').textContent = filtered.length;
   document.getElementById('sn-due').textContent = due.length;
   document.getElementById('sn-master').textContent = mastered.length;
-
-  var stDue = document.getElementById('st-due');
-  stDue.className = 'stat' + (due.length > 0 ? ' hi' : '');
+  document.getElementById('st-due').className = 'stat' + (due.length > 0 ? ' hi' : '');
 
   var btnStart = document.getElementById('btn-start');
   btnStart.disabled = due.length === 0;
   btnStart.textContent = due.length > 0 ? ('復習を始める（' + due.length + '問）') : '今日の復習はありません';
 
-  // カテゴリフィルター（手動・AI追加のカテゴリも動的に追加）
-  var catRow = document.getElementById('cat-row');
   var builtCats = Object.keys(BUILT);
   var customCats = [];
   cards.forEach(function(c){
-    if (c.cat && builtCats.indexOf(c.cat) === -1 && customCats.indexOf(c.cat) === -1) {
-      customCats.push(c.cat);
-    }
+    if (c.cat && builtCats.indexOf(c.cat) === -1 && customCats.indexOf(c.cat) === -1) customCats.push(c.cat);
   });
   var cats = ['all'].concat(builtCats).concat(customCats);
-  catRow.innerHTML = cats.map(function(cat){
+  document.getElementById('cat-row').innerHTML = cats.map(function(cat){
     var label = cat === 'all' ? 'すべて' : cat;
-    var on = cat === currentCat;
-    return '<button class="cat-pill' + (on?' on':'') + '" onclick="setCat(\'' + cat + '\')">' + label + '</button>';
+    return '<button class="cat-pill' + (cat===currentCat?' on':'') + '" onclick="setCat(\'' + cat + '\')">' + label + '</button>';
   }).join('');
 
-  // 最近の問題
   var rw = document.getElementById('recent-wrap');
   var rl = document.getElementById('recent-list');
   if (cards.length === 0) { rw.style.display='none'; return; }
   rw.style.display = 'block';
-  var recent = cards.slice().reverse().slice(0,20);
-  rl.innerHTML = recent.map(function(c){
+  rl.innerHTML = cards.slice().reverse().slice(0,20).map(function(c){
     var ti = TINFO[c.type] || TINFO.recall;
     var isDue = c.nextReview <= todayStr();
     return '<div class="card-item">' +
@@ -574,17 +532,13 @@ function renderHome() {
   }).join('');
 }
 
-function setCat(cat) {
-  currentCat = cat;
-  renderHome();
-}
+function setCat(cat) { currentCat = cat; renderHome(); }
 
 // ══════════════════════════════════════
 // 内蔵問題
 // ══════════════════════════════════════
 function renderBuilt() {
-  var bl = document.getElementById('built-list');
-  bl.innerHTML = Object.keys(BUILT).map(function(cat){
+  document.getElementById('built-list').innerHTML = Object.keys(BUILT).map(function(cat){
     var qs = BUILT[cat];
     var added = cards.filter(function(c){ return c.cat===cat; }).length;
     var pct = Math.min(100, Math.round((added/qs.length)*100));
@@ -601,23 +555,19 @@ function renderBuilt() {
 }
 
 function addBuilt(cat) {
-  var qs = BUILT[cat];
   var existing = {};
   cards.filter(function(c){ return c.cat===cat; }).forEach(function(c){ existing[c.q]=1; });
-  var newCards = qs.filter(function(item){ return !existing[item.q]; }).map(function(item, i){
-    return { id: Date.now()+i, q:item.q, a:item.a, type:item.t, cat:cat,
-             ef:2.5, interval:1, reps:0, nextReview:todayStr() };
+  var newCards = BUILT[cat].filter(function(item){ return !existing[item.q]; }).map(function(item, i){
+    return { id: Date.now()+i, q:item.q, a:item.a, type:item.t, cat:cat, ef:2.5, interval:1, reps:0, nextReview:todayStr() };
   });
   if (!newCards.length) { alert('このカテゴリはすべて追加済みです'); return; }
   cards = cards.concat(newCards);
-  save();
-  renderBuilt();
-  renderHome();
+  save(); renderBuilt(); renderHome();
   alert('✅ ' + cat + 'から' + newCards.length + '問を追加しました！');
 }
 
 // ══════════════════════════════════════
-// 手動追加
+// 手動追加・タブ
 // ══════════════════════════════════════
 function switchTab(t) {
   document.getElementById('panel-m').style.display = t==='m' ? 'block' : 'none';
@@ -637,15 +587,14 @@ function addManual() {
   var typeEl = document.querySelector('input[name="m-type"]:checked');
   var type = typeEl ? typeEl.value : 'recall';
   if (!q || !a) { alert('問題文と解答を入力してください'); return; }
-  var dup = cards.some(function(c){ return c.q === q; });
-  if (dup) { alert('同じ問題文がすでに登録されています'); return; }
+  if (cards.some(function(c){ return c.q === q; })) { alert('同じ問題文がすでに登録されています'); return; }
   cards.push({ id:Date.now(), q:q, a:a, type:type, cat:cat, ef:2.5, interval:1, reps:0, nextReview:todayStr() });
   save();
   document.getElementById('m-q').value = '';
   document.getElementById('m-a').value = '';
   var msg = document.getElementById('m-msg');
-  msg.style.display = 'block'; msg.style.color = '#059669';
-  msg.textContent = '✅ 追加しました！続けて入力できます';
+  msg.style.display='block'; msg.style.color='#059669';
+  msg.textContent='✅ 追加しました！続けて入力できます';
   renderHome();
   setTimeout(function(){ msg.style.display='none'; }, 2500);
 }
@@ -665,11 +614,8 @@ function generateAI() {
   var btn = document.getElementById('btn-ai-gen');
   var msg = document.getElementById('a-msg');
   btn.disabled = true;
-  msg.style.display = 'block'; msg.style.color = '#64748B';
-  msg.textContent = 'AIが問題を生成中…';
-  document.getElementById('a-preview').style.display = 'none';
-
-  var prompt = '基本情報技術者試験の「'+cat+'」分野に関する問題を'+count+'問生成してください。種類をミックス（recall/elaboration/selfexplain）。JSONのみ返すこと（```不要）:\n{"cards":[{"type":"recall","q":"問題文","a":"解答"}]}\nテキスト:\n'+text;
+  msg.style.display='block'; msg.style.color='#64748B'; msg.textContent='AIが問題を生成中…';
+  document.getElementById('a-preview').style.display='none';
 
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'https://api.anthropic.com/v1/messages', true);
@@ -685,9 +631,8 @@ function generateAI() {
         var d = JSON.parse(xhr.responseText);
         var raw = d.content.map(function(b){ return b.text||''; }).join('').replace(/```json|```/g,'').trim();
         aiGenerated = JSON.parse(raw).cards;
-        var ti_map = TINFO;
         document.getElementById('a-preview-list').innerHTML = aiGenerated.map(function(c,i){
-          var ti = ti_map[c.type] || ti_map.recall;
+          var ti = TINFO[c.type]||TINFO.recall;
           return '<div class="preview-card">' +
             '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">' +
               '<span class="tbadge" style="color:'+ti.color+';background:'+ti.bg+'">'+ti.label+'</span>' +
@@ -695,35 +640,20 @@ function generateAI() {
             '<div style="font-size:13px;font-weight:600;color:#1E293B;margin-bottom:4px">'+c.q+'</div>' +
             '<div style="font-size:12px;color:#64748B;line-height:1.6">'+c.a+'</div></div>';
         }).join('');
-        document.getElementById('a-preview').style.display = 'block';
-        msg.style.color = '#059669';
-        msg.textContent = '✅ ' + aiGenerated.length + '問を生成しました。確認して追加してください。';
-      } catch(e) {
-        msg.style.color = '#DC2626';
-        msg.textContent = '❌ 解析エラー: ' + e.message;
-      }
+        document.getElementById('a-preview').style.display='block';
+        msg.style.color='#059669'; msg.textContent='✅ '+aiGenerated.length+'問を生成しました。確認して追加してください。';
+      } catch(e) { msg.style.color='#DC2626'; msg.textContent='❌ 解析エラー: '+e.message; }
     } else {
-      msg.style.color = '#DC2626';
-      var errDetail = '';
-      try { errDetail = JSON.parse(xhr.responseText).error.message; } catch(e){}
-      if (xhr.status === 401) {
-        msg.textContent = '❌ APIキーが無効です（401）。⚙️ API設定で再設定してください。';
-      } else {
-        msg.textContent = '❌ エラー(' + xhr.status + ')' + (errDetail ? ': ' + errDetail : '');
-      }
+      msg.style.color='#DC2626';
+      var errDetail='';
+      try { errDetail=JSON.parse(xhr.responseText).error.message; } catch(e){}
+      msg.textContent='❌ エラー('+xhr.status+')'+(errDetail?': '+errDetail:'');
     }
   };
-  xhr.onerror = function() {
-    btn.disabled = false;
-    msg.style.color = '#DC2626';
-    msg.textContent = '❌ 通信エラー。インターネット接続を確認してください。file://で開いている場合はCORSエラーの可能性があります。';
-  };
-  xhr.ontimeout = function() {
-    btn.disabled = false;
-    msg.style.color = '#DC2626';
-    msg.textContent = '❌ タイムアウト。もう一度お試しください。';
-  };
-  xhr.send(JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1500, messages:[{role:'user',content:prompt}] }));
+  xhr.onerror = function(){ btn.disabled=false; msg.style.color='#DC2626'; msg.textContent='❌ 通信エラー。インターネット接続を確認してください。'; };
+  xhr.ontimeout = function(){ btn.disabled=false; msg.style.color='#DC2626'; msg.textContent='❌ タイムアウト。もう一度お試しください。'; };
+  xhr.send(JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1500,
+    messages:[{role:'user',content:'基本情報技術者試験の「'+cat+'」分野に関する問題を'+count+'問生成してください。種類をミックス（recall/elaboration/selfexplain）。JSONのみ返すこと（```不要）:\n{"cards":[{"type":"recall","q":"問題文","a":"解答"}]}\nテキスト:\n'+text}] }));
 }
 
 function confirmAI() {
@@ -733,36 +663,34 @@ function confirmAI() {
   });
   cards = cards.concat(newCards);
   save(); renderHome();
-  aiGenerated = [];
-  document.getElementById('a-text').value = '';
-  document.getElementById('a-preview').style.display = 'none';
-  var msg = document.getElementById('a-msg');
-  msg.style.color = '#059669';
-  msg.textContent = '✅ ' + newCards.length + '問を追加しました！';
+  aiGenerated=[];
+  document.getElementById('a-text').value='';
+  document.getElementById('a-preview').style.display='none';
+  var msg=document.getElementById('a-msg');
+  msg.style.color='#059669'; msg.textContent='✅ '+newCards.length+'問を追加しました！';
   setTimeout(function(){ goTo('s-home'); }, 1200);
 }
 
 function cancelAI() {
-  aiGenerated = [];
-  document.getElementById('a-preview').style.display = 'none';
-  document.getElementById('a-msg').style.display = 'none';
+  aiGenerated=[];
+  document.getElementById('a-preview').style.display='none';
+  document.getElementById('a-msg').style.display='none';
 }
 
 // ══════════════════════════════════════
 // APIキー設定
 // ══════════════════════════════════════
 function saveKey() {
-  var raw = document.getElementById('key-input').value;
-  var key = raw.replace(/\s/g,'');
+  var key = document.getElementById('key-input').value.replace(/\s/g,'');
   var msg = document.getElementById('key-msg');
   if (!key.startsWith('sk-ant-')) {
     msg.style.display='block'; msg.style.color='#DC2626';
     msg.textContent='❌ 正しいAPIキーを入力してください（sk-ant-...）'; return;
   }
   localStorage.setItem('fe_k', key);
-  document.getElementById('key-input').value = key;
+  document.getElementById('key-input').value=key;
   msg.style.display='block'; msg.style.color='#059669';
-  msg.textContent='✅ 保存しました！AI生成が使えるようになりました。';
+  msg.textContent='✅ 保存しました！';
   renderKeyStatus();
   setTimeout(function(){ goTo('s-home'); }, 1500);
 }
@@ -770,115 +698,18 @@ function saveKey() {
 function clearKey() {
   if (!confirm('APIキーを削除しますか？')) return;
   localStorage.removeItem('fe_k');
-  document.getElementById('key-input').value = '';
+  document.getElementById('key-input').value='';
   renderKeyStatus();
 }
 
 function renderKeyStatus() {
-  var key = getKey();
-  var el = document.getElementById('key-status');
+  var key=getKey(), el=document.getElementById('key-status');
   if (!el) return;
   if (key) {
-    el.innerHTML = '<span style="color:#059669;font-weight:600">✅ 設定済み</span> <span style="font-size:11px;color:#94A3B8">'+key.slice(0,14)+'...'+key.slice(-4)+'（全'+key.length+'文字）</span>';
-    document.getElementById('key-input').value = key;
+    el.innerHTML='<span style="color:#059669;font-weight:600">✅ 設定済み</span> <span style="font-size:11px;color:#94A3B8">'+key.slice(0,14)+'...'+key.slice(-4)+'（全'+key.length+'文字）</span>';
+    document.getElementById('key-input').value=key;
   } else {
-    el.innerHTML = '<span style="color:#DC2626">❌ 未設定</span>';
-  }
-}
-
-// ══════════════════════════════════════
-// セッション
-// ══════════════════════════════════════
-var queue = [], qi = 0;
-
-function startSession() {
-  var filtered = currentCat==='all' ? cards : cards.filter(function(c){ return c.cat===currentCat; });
-  var due = filtered.filter(function(c){ return c.nextReview <= todayStr(); });
-  if (!due.length) return;
-  queue = due.slice().sort(function(){ return Math.random()-0.5; });
-  qi = 0;
-  showCard();
-  goTo('s-session');
-}
-
-function showCard() {
-  var c = queue[qi];
-  var ti = TINFO[c.type] || TINFO.recall;
-  var pct = Math.round((qi/queue.length)*100);
-  document.getElementById('pfill').style.width = pct + '%';
-  document.getElementById('ptxt').textContent = (qi+1) + '/' + queue.length;
-  var ttag = document.getElementById('type-tag');
-  ttag.textContent = ti.label; ttag.style.color = ti.color; ttag.style.background = ti.bg;
-  document.getElementById('cat-tag').textContent = c.cat || '';
-  document.getElementById('reps-tag').textContent = (c.reps||0) > 0 ? '復習'+(c.reps||0)+'回目' : '';
-  document.getElementById('qtxt').textContent = c.q;
-  document.getElementById('u-ans').value = '';
-  document.getElementById('u-exp').value = '';
-  document.getElementById('ph-think').style.display = 'block';
-  document.getElementById('ph-load').style.display = 'none';
-  document.getElementById('ph-exp').style.display = 'none';
-  document.getElementById('f-box').style.display = 'none';
-  var br = document.getElementById('btn-rev');
-  br.disabled = true;
-  document.getElementById('u-ans').oninput = function(){ br.disabled = !this.value.trim(); };
-}
-
-function revealAnswer() {
-  var c = queue[qi];
-  var ua = document.getElementById('u-ans').value;
-  document.getElementById('ph-think').style.display = 'none';
-  document.getElementById('ph-load').style.display = 'block';
-  document.getElementById('a-txt').textContent = c.a;
-
-  var apiKey = getKey();
-  if (!apiKey) {
-    document.getElementById('ph-load').style.display = 'none';
-    document.getElementById('ph-exp').style.display = 'block';
-    return;
-  }
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'https://api.anthropic.com/v1/messages', true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.setRequestHeader('x-api-key', apiKey);
-  xhr.setRequestHeader('anthropic-version', '2023-06-01');
-  xhr.setRequestHeader('anthropic-dangerous-direct-browser-access', 'true');
-  xhr.timeout = 15000;
-  xhr.onload = function() {
-    if (xhr.status >= 200 && xhr.status < 300) {
-      try {
-        var d = JSON.parse(xhr.responseText);
-        document.getElementById('f-txt').textContent = d.content[0].text;
-        document.getElementById('f-box').style.display = 'block';
-      } catch(e){}
-    }
-    document.getElementById('ph-load').style.display = 'none';
-    document.getElementById('ph-exp').style.display = 'block';
-  };
-  xhr.onerror = xhr.ontimeout = function() {
-    document.getElementById('ph-load').style.display = 'none';
-    document.getElementById('ph-exp').style.display = 'block';
-  };
-  var prompt = '基本情報技術者試験の問題フィードバックを1〜2文で日本語で。\n問題:'+c.q+'\n正解:'+c.a+'\n回答:'+ua;
-  xhr.send(JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:200, messages:[{role:'user',content:prompt}] }));
-}
-
-function gradeCard(g) {
-  var c = queue[qi];
-  var upd = sm2(c, g);
-  cards = cards.map(function(card){ return card.id===c.id ? Object.assign({},card,upd) : card; });
-  save();
-  if (qi+1 < queue.length) {
-    qi++;
-    showCard();
-  } else {
-    var mastered = cards.filter(function(c){ return (c.reps||0)>=3; }).length;
-    var nextDates = cards.filter(function(c){ return c.nextReview > todayStr(); }).map(function(c){ return c.nextReview; }).sort();
-    document.getElementById('d-count').textContent = queue.length + '問';
-    document.getElementById('d-master').textContent = mastered + '問';
-    document.getElementById('d-next').textContent = nextDates[0] ? nextDates[0].slice(5) : 'なし';
-    goTo('s-done');
-    renderHome();
+    el.innerHTML='<span style="color:#DC2626">❌ 未設定</span>';
   }
 }
 
@@ -886,120 +717,171 @@ function gradeCard(g) {
 // エクスポート・インポート
 // ══════════════════════════════════════
 function exportData() {
-  var data = {
-    version: 1,
-    exportDate: new Date().toISOString(),
-    cards: cards
-  };
-  var json = JSON.stringify(data, null, 2);
-  var blob = new Blob([json], {type: 'application/json'});
+  var json = JSON.stringify({version:1, exportDate:new Date().toISOString(), cards:cards}, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
-  a.href = url;
-  a.download = 'fe-study-backup-' + new Date().toISOString().split('T')[0] + '.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  var info = document.getElementById('export-info');
-  if (info) {
-    info.style.color = '#059669';
-    info.textContent = '✅ ' + cards.length + '問をエクスポートしました！';
-  }
+  a.href=url; a.download='fe-study-backup-'+todayStr()+'.json';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  var info=document.getElementById('export-info');
+  if (info) { info.style.color='#059669'; info.textContent='✅ '+cards.length+'問をエクスポートしました！'; }
 }
 
 function importData(event) {
-  var file = event.target.files[0];
-  if (!file) return;
-  var msg = document.getElementById('import-msg');
-  msg.style.display = 'block';
-  msg.style.color = '#64748B';
-  msg.textContent = '読み込み中...';
-  var reader = new FileReader();
-  reader.onload = function(e) {
+  var file=event.target.files[0]; if (!file) return;
+  var msg=document.getElementById('import-msg');
+  msg.style.display='block'; msg.style.color='#64748B'; msg.textContent='読み込み中...';
+  var reader=new FileReader();
+  reader.onload=function(e){
     try {
-      var data = JSON.parse(e.target.result);
-      var imported = data.cards || data; // バージョン1形式とそうでない場合に対応
+      var data=JSON.parse(e.target.result);
+      var imported=data.cards||data;
       if (!Array.isArray(imported)) throw new Error('不正なデータ形式です');
-      // 重複しないものだけ追加
-      var existingIds = {};
-      cards.forEach(function(c){ existingIds[c.q] = 1; });
-      var newCards = imported.filter(function(c){ return !existingIds[c.q]; });
-      cards = cards.concat(newCards);
-      save();
-      renderHome();
-      msg.style.color = '#059669';
-      msg.textContent = '✅ ' + newCards.length + '問を追加しました！（重複' + (imported.length - newCards.length) + '問はスキップ）';
-    } catch(e) {
-      msg.style.color = '#DC2626';
-      msg.textContent = '❌ 読み込み失敗: ' + e.message;
-    }
+      var existingQs={};
+      cards.forEach(function(c){ existingQs[c.q]=1; });
+      var newCards=imported.filter(function(c){ return !existingQs[c.q]; });
+      cards=cards.concat(newCards);
+      save(); renderHome();
+      msg.style.color='#059669';
+      msg.textContent='✅ '+newCards.length+'問を追加しました！（重複'+(imported.length-newCards.length)+'問はスキップ）';
+    } catch(e) { msg.style.color='#DC2626'; msg.textContent='❌ 読み込み失敗: '+e.message; }
   };
   reader.readAsText(file);
-  event.target.value = ''; // 同じファイルを再選択できるようにリセット
+  event.target.value='';
 }
 
-// goTo関数にs-syncのハンドリングを追加（export-infoの初期化）
-var _origGoTo = goTo;
-goTo = function(id) {
-  _origGoTo(id);
-  if (id === 's-sync') {
-    var info = document.getElementById('export-info');
-    if (info) info.textContent = '現在 ' + cards.length + '問が保存されています。';
+// ══════════════════════════════════════
+// セッション
+// ══════════════════════════════════════
+var queue=[], qi=0;
+
+function startSession() {
+  var filtered=currentCat==='all'?cards:cards.filter(function(c){ return c.cat===currentCat; });
+  var due=filtered.filter(function(c){ return c.nextReview<=todayStr(); });
+  if (!due.length) return;
+  queue=due.slice().sort(function(){ return Math.random()-0.5; });
+  qi=0; showCard(); goTo('s-session');
+}
+
+function showCard() {
+  var c=queue[qi], ti=TINFO[c.type]||TINFO.recall;
+  var pct=Math.round((qi/queue.length)*100);
+  document.getElementById('pfill').style.width=pct+'%';
+  document.getElementById('ptxt').textContent=(qi+1)+'/'+queue.length;
+  var ttag=document.getElementById('type-tag');
+  ttag.textContent=ti.label; ttag.style.color=ti.color; ttag.style.background=ti.bg;
+  document.getElementById('cat-tag').textContent=c.cat||'';
+  document.getElementById('reps-tag').textContent=(c.reps||0)>0?'復習'+(c.reps||0)+'回目':'';
+  document.getElementById('qtxt').textContent=c.q;
+  document.getElementById('u-ans').value='';
+  document.getElementById('u-exp').value='';
+  document.getElementById('ph-think').style.display='block';
+  document.getElementById('ph-load').style.display='none';
+  document.getElementById('ph-exp').style.display='none';
+  document.getElementById('f-box').style.display='none';
+  var br=document.getElementById('btn-rev');
+  br.disabled=true;
+  document.getElementById('u-ans').oninput=function(){ br.disabled=!this.value.trim(); };
+}
+
+function revealAnswer() {
+  var c=queue[qi], ua=document.getElementById('u-ans').value;
+  document.getElementById('ph-think').style.display='none';
+  document.getElementById('ph-load').style.display='block';
+  document.getElementById('a-txt').textContent=c.a;
+  var apiKey=getKey();
+  if (!apiKey) {
+    document.getElementById('ph-load').style.display='none';
+    document.getElementById('ph-exp').style.display='block'; return;
   }
-};
+  var xhr=new XMLHttpRequest();
+  xhr.open('POST','https://api.anthropic.com/v1/messages',true);
+  xhr.setRequestHeader('Content-Type','application/json');
+  xhr.setRequestHeader('x-api-key',apiKey);
+  xhr.setRequestHeader('anthropic-version','2023-06-01');
+  xhr.setRequestHeader('anthropic-dangerous-direct-browser-access','true');
+  xhr.timeout=15000;
+  xhr.onload=function(){
+    if (xhr.status>=200&&xhr.status<300) {
+      try { var d=JSON.parse(xhr.responseText); document.getElementById('f-txt').textContent=d.content[0].text; document.getElementById('f-box').style.display='block'; } catch(e){}
+    }
+    document.getElementById('ph-load').style.display='none';
+    document.getElementById('ph-exp').style.display='block';
+  };
+  xhr.onerror=xhr.ontimeout=function(){
+    document.getElementById('ph-load').style.display='none';
+    document.getElementById('ph-exp').style.display='block';
+  };
+  xhr.send(JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,
+    messages:[{role:'user',content:'基本情報技術者試験の問題フィードバックを1〜2文で日本語で。\n問題:'+c.q+'\n正解:'+c.a+'\n回答:'+ua}]}));
+}
+
+function gradeCard(g) {
+  var c=queue[qi], upd=sm2(c,g);
+  cards=cards.map(function(card){ return card.id===c.id?Object.assign({},card,upd):card; });
+  save();
+  if (qi+1<queue.length) { qi++; showCard(); }
+  else {
+    var mastered=cards.filter(function(c){ return (c.reps||0)>=3; }).length;
+    var nextDates=cards.filter(function(c){ return c.nextReview>todayStr(); }).map(function(c){ return c.nextReview; }).sort();
+    document.getElementById('d-count').textContent=queue.length+'問';
+    document.getElementById('d-master').textContent=mastered+'問';
+    document.getElementById('d-next').textContent=nextDates[0]?nextDates[0].slice(5):'なし';
+    goTo('s-done'); renderHome();
+  }
+}
+
+// ══════════════════════════════════════
+// Firebase リアルタイム同期
+// ══════════════════════════════════════
+function initFirebaseSync() {
+  var cardsRef = db.ref(USER_ID + '/cards');
+
+  // まずlocalStorageのデータをFirebaseにマージ
+  var localCards = [];
+  try { localCards = JSON.parse(localStorage.getItem('fe_c') || '[]'); } catch(e){}
+
+  cardsRef.once('value').then(function(snapshot) {
+    var fbData = snapshot.val() || {};
+    var fbCards = Object.values(fbData);
+    var fbQs = {};
+    fbCards.forEach(function(c){ fbQs[c.q]=1; });
+
+    var toAdd = localCards.filter(function(c){ return !fbQs[c.q]; });
+    if (toAdd.length > 0) {
+      toAdd.forEach(function(c){ fbData[c.id]=c; });
+      cardsRef.set(fbData).then(function(){
+        showSyncStatus('✅ '+toAdd.length+'問をFirebaseに同期しました', '#059669');
+        setTimeout(function(){ showSyncStatus('🔄 同期中', '#94A3B8'); }, 3000);
+      });
+    }
+
+    // リアルタイム監視開始
+    cardsRef.on('value', function(snap) {
+      var data = snap.val();
+      if (data) {
+        var fbList = Object.values(data);
+        // 件数が増えた場合のみ更新（復習中の上書き防止）
+        if (fbList.length >= cards.length) {
+          cards = fbList;
+          try { localStorage.setItem('fe_c', JSON.stringify(cards)); } catch(e){}
+          renderHome();
+        }
+      }
+      showSyncStatus('🔄 同期済み', '#94A3B8');
+    });
+  }).catch(function(e){
+    console.log('Firebase接続エラー:', e);
+    showSyncStatus('⚠️ オフライン（localStorageで動作中）', '#D97706');
+  });
+}
 
 // ══════════════════════════════════════
 // 初期化
 // ══════════════════════════════════════
 renderHome();
-
-// Firebase同期開始
-// localStorageにデータがあればFirebaseにマージしてから監視開始
-setTimeout(function(){
-  var localCards = [];
-  try { localCards = JSON.parse(localStorage.getItem('fe_c') || '[]'); } catch(e){}
-
-  if (localCards.length > 0) {
-    // まずFirebaseの現在のデータを取得
-    get(ref(db, USER_ID + '/cards')).then(function(snapshot) {
-      var fbData = snapshot.val() || {};
-      var fbCards = Object.values(fbData);
-
-      // localStorageのデータとFirebaseのデータをマージ（重複は問題文で判定）
-      var merged = fbCards.slice();
-      var fbQs = {};
-      fbCards.forEach(function(c){ fbQs[c.q] = 1; });
-
-      var addedCount = 0;
-      localCards.forEach(function(c){
-        if (!fbQs[c.q]) {
-          merged.push(c);
-          addedCount++;
-        }
-      });
-
-      if (addedCount > 0) {
-        // マージしたデータをFirebaseに保存
-        var obj = {};
-        merged.forEach(function(c){ obj[c.id] = c; });
-        set(ref(db, USER_ID + '/cards'), obj).then(function(){
-          showSyncStatus('✅ ' + addedCount + '問をFirebaseに同期しました', '#059669');
-          setTimeout(function(){ showSyncStatus(''); }, 3000);
-        });
-      }
-
-      // リアルタイム監視を開始
-      loadFromFirebase();
-    }).catch(function(e){
-      console.log('Firebase初期化エラー:', e);
-      loadFromFirebase();
-    });
-  } else {
-    // localStorageにデータがない場合はそのままFirebaseから読み込む
-    loadFromFirebase();
-  }
-}, 500);
+initFirebaseSync();
 </script>
 </body>
 </html>
