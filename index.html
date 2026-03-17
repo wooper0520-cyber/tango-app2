@@ -199,6 +199,30 @@ textarea:focus,input:focus,select:focus{border-color:#93C5FD}
   </div>
 </div>
 
+<!-- 編集 -->
+<div id="s-edit" class="screen">
+  <button class="bb" onclick="goTo('s-home')">← 戻る</button>
+  <h2>問題を編集する</h2>
+  <div style="margin-bottom:10px"><label>カテゴリ</label>
+    <select id="e-cat"><option>ストラテジ</option><option>マネジメント</option><option>テクノロジ</option><option>セキュリティ</option><option>ネットワーク</option><option>DB</option><option>ハードウェア</option><option>アルゴリズム</option><option>その他</option></select></div>
+  <div style="margin-bottom:10px"><label>問題文（改行はそのまま入力OK）</label><textarea id="e-q" rows="4" placeholder="問題文"></textarea></div>
+  <div style="margin-bottom:10px"><label>解答・解説（改行はそのまま入力OK）</label><textarea id="e-a" rows="4" placeholder="解答・解説"></textarea></div>
+  <div style="margin-bottom:14px">
+    <label>問題タイプ</label>
+    <div style="display:flex;gap:12px;margin-top:4px">
+      <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="radio" name="e-type" value="recall" checked> リコール</label>
+      <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="radio" name="e-type" value="elaboration"> 精緻化</label>
+      <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="radio" name="e-type" value="selfexplain"> 自己説明</label>
+    </div>
+  </div>
+  <input type="hidden" id="e-id">
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <button class="bs" onclick="deleteCard()" style="width:auto;padding:11px 14px;font-size:12px;color:#DC2626;border-color:#FECACA !important">🗑 削除</button>
+    <button class="bp" onclick="saveEdit()" style="flex:1">保存する</button>
+  </div>
+  <div class="msg" id="e-msg"></div>
+</div>
+
 <!-- セッション -->
 <div id="s-session" class="screen">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
@@ -562,6 +586,13 @@ var BUILT = {
   ]
 };
 
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function nl2br(s) {
+  return escHtml(s).replace(/\n/g,'<br>');
+}
+
 var TINFO = {
   recall:      {label:'リコール',  color:'#1D4ED8', bg:'#EFF6FF'},
   elaboration: {label:'精緻化',    color:'#6D28D9', bg:'#F5F3FF'},
@@ -653,6 +684,7 @@ function renderHome() {
       '<span class="tbadge" style="background:#F1F5F9;color:#64748B">'+c.cat+'</span>' +
       '<span class="cq">'+c.q+'</span>' +
       '<span class="cd'+(isDue?' due':'')+'">'+( isDue?'今日！':c.nextReview.slice(5))+'</span>' +
+      '<button onclick="openEdit(\'' + c.id + '\')" style="background:none;border:none;color:#94A3B8;font-size:11px;cursor:pointer;padding:2px 4px;width:auto">✏️</button>' +
       '</div>';
   }).join('');
 }
@@ -898,7 +930,7 @@ function showCard() {
   ttag.textContent=ti.label; ttag.style.color=ti.color; ttag.style.background=ti.bg;
   document.getElementById('cat-tag').textContent=c.cat||'';
   document.getElementById('reps-tag').textContent=(c.reps||0)>0?'復習'+(c.reps||0)+'回目':'';
-  document.getElementById('qtxt').textContent=c.q;
+  document.getElementById('qtxt').innerHTML=nl2br(c.q);
   document.getElementById('u-ans').value='';
   document.getElementById('u-exp').value='';
   document.getElementById('ph-think').style.display='block';
@@ -914,7 +946,7 @@ function revealAnswer() {
   var c=queue[qi], ua=document.getElementById('u-ans').value;
   document.getElementById('ph-think').style.display='none';
   document.getElementById('ph-load').style.display='block';
-  document.getElementById('a-txt').textContent=c.a;
+  document.getElementById('a-txt').innerHTML=nl2br(c.a);
   var apiKey=getKey();
   if (!apiKey) {
     document.getElementById('ph-load').style.display='none';
@@ -955,6 +987,55 @@ function gradeCard(g) {
     document.getElementById('d-next').textContent=nextDates[0]?nextDates[0].slice(5):'なし';
     goTo('s-done'); renderHome();
   }
+}
+
+// ══════════════════════════════════════
+// 問題の編集・削除
+// ══════════════════════════════════════
+function openEdit(id) {
+  var c = cards.find(function(c){ return String(c.id) === String(id); });
+  if (!c) { alert('問題が見つかりません'); return; }
+  document.getElementById('e-id').value = c.id;
+  document.getElementById('e-q').value = c.q;
+  document.getElementById('e-a').value = c.a;
+  document.getElementById('e-cat').value = c.cat || 'その他';
+  var typeEl = document.querySelector('input[name="e-type"][value="'+(c.type||'recall')+'"]');
+  if (typeEl) typeEl.checked = true;
+  document.getElementById('e-msg').style.display = 'none';
+  goTo('s-edit');
+}
+
+function saveEdit() {
+  var id = document.getElementById('e-id').value;
+  var q = document.getElementById('e-q').value.trim();
+  var a = document.getElementById('e-a').value.trim();
+  var cat = document.getElementById('e-cat').value;
+  var typeEl = document.querySelector('input[name="e-type"]:checked');
+  var type = typeEl ? typeEl.value : 'recall';
+  if (!q || !a) { alert('問題文と解答を入力してください'); return; }
+  cards = cards.map(function(c){
+    if (String(c.id) === String(id)) {
+      return Object.assign({}, c, {q:q, a:a, cat:cat, type:type});
+    }
+    return c;
+  });
+  save();
+  renderHome();
+  var msg = document.getElementById('e-msg');
+  msg.style.display='block'; msg.style.color='#059669';
+  msg.textContent='✅ 保存しました！';
+  setTimeout(function(){ goTo('s-home'); }, 1000);
+}
+
+function deleteCard() {
+  var id = document.getElementById('e-id').value;
+  var c = cards.find(function(c){ return String(c.id) === String(id); });
+  if (!c) return;
+  if (!confirm('「' + c.q.slice(0,20) + '...」を削除しますか？')) return;
+  cards = cards.filter(function(c){ return String(c.id) !== String(id); });
+  save();
+  renderHome();
+  goTo('s-home');
 }
 
 // ══════════════════════════════════════
